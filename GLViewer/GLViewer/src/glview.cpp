@@ -29,6 +29,11 @@ void GLView::paintGL()
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_lightShader.bind();
+
+    m_lightShader.setUniformValue("projection", m_projectionMat);
+    m_lightShader.setUniformValue("view", m_viewMat);
+    m_lightShader.setUniformValue("model", m_modelMat);
+
     m_model->Draw(m_lightShader);
     m_lightShader.release();
 

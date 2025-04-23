@@ -27,6 +27,10 @@ private:
 private:
     Model* m_model = nullptr;
 
+    QMatrix4x4 m_modelMat;
+    QMatrix4x4 m_viewMat;
+    QMatrix4x4 m_projectionMat;
+
     // 着色器变量
     QOpenGLShaderProgram m_lightShader;
 
