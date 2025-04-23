@@ -1,0 +1,33 @@
+# user files
+assets/python38env/
+pack/packages/root/data/
+pack/packages/mysql/data/
+
+# cmake files
+build/
+Videos/
+ninja/
+cmake-build-*/
+Debug/
+Release/
+.xmake/
+
+# ide files
+/.vs
+/.idea
+/.vscode
+/.cache
+CMakeSettings.json
+CMakePresets.json
+CMakeUserPresets.json
+.vim_localrc
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+compile_commands.json
+
+# user files
+pack/packages/root/data/
+pack/*.exe
+
+# qt
+*.pro.user
