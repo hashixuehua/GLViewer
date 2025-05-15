@@ -26,6 +26,9 @@ CMakeLists.txt.user
 CMakeLists.txt.user.*
 compile_commands.json
 
+#dependencies
+dependencies/
+
 # user files
 pack/packages/root/data/
 pack/*.exe

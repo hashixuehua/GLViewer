@@ -2,16 +2,6 @@ file(GLOB_RECURSE source CONFIGURE_DEPENDS *.h *.cpp *.qrc *.ui)
 
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets OpenGLWidgets)
-find_package(Qt6 REQUIRED COMPONENTS Gui)
-
-#CGLib
-set(CGLib "${CMAKE_SOURCE_DIR}/../../dependencies/CGLib")
-if(WIN32)
-    include_directories(${CGLib}/include)
-    #find_library(GEOMETRYUTILS_LIB geo HINTS ${PROJECT_SOURCE_DIR}/testFunc/lib)
-    link_directories(${CGLib}/bin/win64/Release)
-    link_libraries(CGLib.lib)
-endif()
 
 set(PROJECT_SOURCES ${source})
 
@@ -39,9 +29,6 @@ else()
 endif()
 
 target_link_libraries(GLViewer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::OpenGLWidgets)
-target_link_libraries(GLViewer PRIVATE Qt6::Gui)
-
-target_include_directories(GLViewer PRIVATE .)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

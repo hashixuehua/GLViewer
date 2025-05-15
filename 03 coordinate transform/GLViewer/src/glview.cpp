@@ -16,35 +16,19 @@ void GLView::initializeGL()
 {
     initializeOpenGLFunctions();
     initShader(m_lightShader);
-
     m_model = new Model(this);
-    m_camera.lastFrame = QTime::currentTime().msecsSinceStartOfDay() / 1000.0;
 
 }
-
 void GLView::resizeGL(int w, int h)
 {
-    glViewport(0, 0, w, h);
 
-    m_camera.SCR_WIDTH = w;
-    m_camera.SCR_HEIGHT = h;
 }
-
 void GLView::paintGL()
 {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    float currentFrame = QTime::currentTime().msecsSinceStartOfDay() / 1000.0;
-    m_camera.deltaTime = currentFrame - m_camera.lastFrame;
-    m_camera.lastFrame = currentFrame;
-
     m_lightShader.bind();
-
-    m_projectionMat.setToIdentity();
-    m_projectionMat.perspective(/*qDegreesToRadians*/(m_camera.Zoom), (float)m_camera.SCR_WIDTH / (float)m_camera.SCR_HEIGHT, 0.1f, 100.0f);
-
-    m_viewMat = m_camera.GetViewMatrix();
 
     m_lightShader.setUniformValue("projection", m_projectionMat);
     m_lightShader.setUniformValue("view", m_viewMat);
@@ -70,16 +54,5 @@ void GLView::initShader(QOpenGLShaderProgram& shader)
     if (!result) {
         qDebug() << shader.log();
     }
-}
-
-bool GLView::event(QEvent* e)
-{
-    makeCurrent();
-
-    if (m_camera.handle(e))
-        update();
-
-    doneCurrent();
-    return QWidget::event(e);
 }
 

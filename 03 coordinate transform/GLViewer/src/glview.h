@@ -8,7 +8,6 @@
 #include <QOpenGLBuffer>
 
 #include "model.h"
-#include "camera.h"
 
 class GLView : public QOpenGLWidget, QOpenGLFunctions_4_5_Core
 {
@@ -22,14 +21,11 @@ protected:
     virtual void resizeGL(int w, int h);
     virtual void paintGL();
 
-    virtual bool event(QEvent* e);
-
 private:
     void initShader(QOpenGLShaderProgram& shader);
 
 private:
     Model* m_model = nullptr;
-    Camera m_camera = Camera(this, QVector3D(0.0f, 6.0f, 10.0f));
 
     QMatrix4x4 m_modelMat;
     QMatrix4x4 m_viewMat;
