@@ -2,15 +2,7 @@
 
 GLView::GLView(QWidget *parent)
     : QOpenGLWidget{parent}
-{
-    //  y-up to z-up
-    m_modelMatrix = QMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, -1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f);//(1.0f);
-    m_modelMatrix = m_modelMatrix.transposed();
-
-}
+{}
 
 GLView::~GLView()
 {
@@ -23,11 +15,6 @@ GLView::~GLView()
 void GLView::initializeGL()
 {
     initializeOpenGLFunctions();
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     initShader(m_lightShader);
 
     m_model = new Model(this);
@@ -46,7 +33,7 @@ void GLView::resizeGL(int w, int h)
 void GLView::paintGL()
 {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     float currentFrame = QTime::currentTime().msecsSinceStartOfDay() / 1000.0;
     m_camera.deltaTime = currentFrame - m_camera.lastFrame;
@@ -61,9 +48,9 @@ void GLView::paintGL()
 
     m_lightShader.setUniformValue("projection", m_projectionMat);
     m_lightShader.setUniformValue("view", m_viewMat);
-    m_lightShader.setUniformValue("model", m_modelMatrix);
+    m_lightShader.setUniformValue("model", m_modelMat);
 
-    m_model->Draw2(m_lightShader);
+    m_model->Draw(m_lightShader);
     m_lightShader.release();
 
 }

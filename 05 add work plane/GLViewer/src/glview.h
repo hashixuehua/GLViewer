@@ -31,7 +31,7 @@ private:
     Model* m_model = nullptr;
     Camera m_camera = Camera(this, QVector3D(0.0f, 6.0f, 10.0f));
 
-    QMatrix4x4 m_modelMatrix;  //y-up to z-up
+    QMatrix4x4 m_modelMat;
     QMatrix4x4 m_viewMat;
     QMatrix4x4 m_projectionMat;
 
