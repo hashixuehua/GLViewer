@@ -1,7 +1,17 @@
 #ifndef GLWINDOW_H
 #define GLWINDOW_H
 
+#include <string>
 #include <QMainWindow>
+#include <QLabel>
+#include <QCheckBox>
+#include <QPushButton>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QHBoxLayout>
+#include <QSplitter.h>
+
+using namespace std;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,9 +29,16 @@ public:
 
 protected:
     void createActions(void);
+    void createStatusBar(void);
 
+    void OnStatusMessageChanged(const string& message);
 
 private:
     Ui::GLWindow *ui;
+
+    //  status bar
+    QLabel* mousePosLabel;  // used for show mouse position
+    QLabel* statusMessage;  // used for show status message
+
 };
 #endif // GLWINDOW_H

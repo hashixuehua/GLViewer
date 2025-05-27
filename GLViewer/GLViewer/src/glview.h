@@ -6,6 +6,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
+#include <QLineEdit>
 
 #include "model.h"
 #include "camera.h"
@@ -24,6 +25,10 @@ protected:
 
     virtual bool event(QEvent* e);
 
+    void UpdateParaInputPos(int px, int py);
+    void OnCommandExcuted(bool onlyMove = true);
+    void OnCommandStart();
+
 private:
     void initShader(QOpenGLShaderProgram& shader);
     void initTextureShader(QOpenGLShaderProgram& shader);
@@ -34,6 +39,24 @@ private:
     int ClickedViewCube(int px, int py);
 
     void onMouseLeftPress(QMouseEvent* event);
+    void onKeyPress(QKeyEvent* event);
+    void onMouseMove(QMouseEvent* event);
+    void onMouseButtonRelease();
+
+    bool tryToExcuteCommandOnValidKeyPress();
+
+public:
+    std::function<void(const string&)> OnStatusMessageChanged;
+
+private:
+    //  current mouse pos
+    int currentMousePos[2];
+
+    //  command
+    CommandPara* m_commandPara;
+
+    //  input
+    QLineEdit* paraInput;
 
 private:
     Model* m_model = nullptr;
@@ -48,8 +71,14 @@ private:
     QOpenGLShaderProgram m_lightShader;
     QOpenGLShaderProgram m_textureShader;
 
+private:
+    void drawCurve(ViewerStatus status, int drawType = -1);
+    bool getRayIntersection(int px, int py, QVector3D& hitPt);
+
 public slots:
     void drawLine();
+    void updatePreviewNextPoint(QMouseEvent* event);
+
 
 signals:
 };

@@ -7,6 +7,31 @@
 using namespace std;
 using namespace CGUTILS;
 
+enum GLCurveType
+{
+    GLUnknown,
+    GLLine,
+    GLArc,
+    GLCircle,
+    GLEllipseArc,
+    GLRectangle,
+    //  TODO 样条曲线
+
+    GLTemp,  //主要为了使用预览
+    GLPoint,  //主要为了显示捕获点
+};
+
+enum GLNodeType
+{
+    GLUnKnown,
+    GLCurveNode0,  //端点1
+    GLCurveNode1,  //端点2
+    GLCurveNodeM,  //中点
+    GLCircleCenter,  //圆心
+    GLOnCurve,  //其他线上点
+    GLAxisNetNode,  //轴线交点
+};
+
 enum BodyInfoType
 {
     B_Unknown,
@@ -124,6 +149,26 @@ public:
     int originHeight;
 };
 
+class ModelNode
+{
+public:
+    ModelNode() : nodeType(GLNodeType::GLUnKnown), curveId(-1) {}
+    ModelNode(GLNodeType nType, const Vector3f& pt, int curvId) : nodeType(nType), point(pt), curveId(curvId) {}
+
+public:
+    GLNodeType nodeType;
+    Vector3f point;
+    int curveId;
+};
+
+class CurveData
+{
+public:
+    GLCurveType curveType;
+    vector<Vector3f> vertex;
+    string layerName;
+};
+
 class WorkPlanePara
 {
 public:
@@ -141,12 +186,90 @@ public:
     float offset;
 };
 
+class CommandPara
+{
+public:
+    CommandPara() : vType(-1), pValue(), dValue(0.0), strValue("") {}
+    CommandPara(const Vector3f& point) : vType(1), pValue(point) {}
+    CommandPara(double value) : vType(2), dValue(value) {}
+    CommandPara(const string& value) : vType(3), strValue(value) {}
+
+public:
+    void Init()
+    {
+        vType = -1;
+    }
+
+    void Init(const Vector3f& point)
+    {
+        vType = 1;
+        pValue = point;
+    }
+
+    void Init(double value)
+    {
+        vType = 2;
+        dValue = value;
+    }
+
+    void Init(const string& value)
+    {
+        vType = 3;
+        strValue = value;
+    }
+
+    int vType;  //1:point  2:double  3:string
+    Vector3f pValue;
+    double dValue;
+    string strValue;
+};
+
+class PeviewData
+{
+public:
+    PeviewData();
+
+    GLCurveType curveType;
+    int drawType;  //多种方式draw curve，如[起始点、终止点、弧上点]、[圆心、半径、起始弧度、终止弧度]都可画圆弧
+    Vector3f wkPlaneNormal;  //工作平面法向
+    vector<CommandPara> curData;
+    Vector3f* previewNextPt;
+    bool complete;
+
+    //  temp data
+    //vector<Vector3f> lstTempPt;
+
+public:
+    void addPoint(const Vector3f& pt);
+    void addDouble(double value);
+    void addString(const string& value);
+
+    void addPara(const CommandPara& para);
+    void update(const CommandPara& para);
+    void clear();
+
+    //  TODO GETLINES  考虑和getPreviewLines实现公用基础
+    void getCompleteLines(list<Line>& lines) const;
+    void getPreviewLines(list<Line>& lines) const;
+
+    const Vector3f* GetCurLastValidPoint() const;
+
+private:
+    void getLines(const CommandPara& lastVert, list<Line>& lines) const;
+
+};
+
 class CGLibUtils
 {
 public:
+    static void getContinusLines(const vector<Vector3f>& lstVert, list<Line>& lines);
+    static void getPoints(const list<Line>& lines, list<Vector3f>& verts);
+
     static void GenerateCubeMesh(const vector<Vector3f>& sectionPts, const Vector3f& normal, float height, TriangleMesh& mesh);
     static void getRectSection(const Vector3f& origin, const Vector3f& normal, float halfLen, float offset, Vector3f* pts);  //Vector3f pts[4]
     static void GetPolygonCenter(const list<Line>& lines, Vector3f& center);
     static bool getClickHittedPlane(const Vector3f& rayOri, const Vector3f& rayEnd, const BodyInfo& bodyInfo, Vector3f& planePt, Vector3f& planeNormal);
 
+    static void sortLinesByLayer(const map<PointData_1e_3, vector<CurveData*>>& lines, const map<CurveData*, bool>& mapIgnoreCurveData, const map<CurveData*, bool>& mapTargetCurveData,
+        map<string, map<PointData_1e_3, vector<CurveData*>>>& mapLayer2Lines);
 };

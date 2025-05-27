@@ -3,8 +3,13 @@
 Model::Model(QOpenGLFunctions_4_5_Core* glFunc):
     m_glFunc(glFunc),
     m_VBO(QOpenGLBuffer::VertexBuffer),
-    m_EBO(QOpenGLBuffer::IndexBuffer)
+    m_EBO(QOpenGLBuffer::IndexBuffer),
+    previewData(),
+    snapMode(true),
+    orthogonalityMode(false)
 {
+    drawingLinesholder = new DrawingLinesHolder(glFunc);
+
     setupWorkPlaneMesh();
     setupViewCube();
     setupMouse();
@@ -64,6 +69,8 @@ void Model::Draw2(QOpenGLShaderProgram& shader)
 
     Draw(shader);
 
+    drawingLinesholder->DrawLines(shader, previewData);
+    drawingLinesholder->DrawSelectedLines(shader);
 }
 
 void Model::drawWorkPlane(QOpenGLShaderProgram& shader)
@@ -109,6 +116,146 @@ void Model::DrawViewElement(QOpenGLShaderProgram& shader, const string& name)
 
     textTexture->release();
 }
+
+//////////////////////////////////////
+
+////////// draw lines
+
+void Model::BeginToDrawLines(GLCurveType curveType, int drawType/* = -1*/)
+{
+    drawingLinesholder->BeginToDrawLines(curveType, drawType);
+
+    previewData.curveType = curveType;
+    previewData.drawType = drawType;
+    previewData.wkPlaneNormal = currentWorkPlNormal;
+}
+
+void Model::AddVertexToLines(const CommandPara& para)
+{
+    previewData.addPara(para);
+    if (previewData.complete)
+    {
+        //lines.at(norDefualt).back().vertex.push_back(vert);
+        addCompletePreviewDataToLines();
+        previewData.update(para);
+    }
+
+    //if (previewData.curveType == GLCurveType::GLTemp && ViewerSetting::viewerStatus == ViewerStatus::Copy && !basePt4Copy)
+    //{
+    //    basePt4Copy = new Vector3f(previewData.curData.back().pValue);
+    //}
+}
+
+void Model::SetPreviewNextPoint(double x, double y, double z)
+{
+    if (previewData.previewNextPt == nullptr)
+        previewData.previewNextPt = new Vector3f();
+
+    previewData.previewNextPt->X = x;
+    previewData.previewNextPt->Y = y;
+    previewData.previewNextPt->Z = z;
+
+    if (!snapMode)
+        return;
+
+    //  捕捉吸附
+    drawingLinesholder->GetSnapPoint(*previewData.previewNextPt);
+}
+
+void Model::ClearInvalidData()
+{
+    drawingLinesholder->ClearInvalidData();
+}
+
+bool Model::isLinePreviewValid()
+{
+    //if (lines.at(norDefualt).empty() || lines.at(norDefualt).back().vertex.size() < 1)
+    //    return false;
+    //if (previewData.curveType == GLCurveType::GLUnknown || previewData.curData.size() < 1)
+    //    return false;
+    if (previewData.curveType == GLCurveType::GLUnknown /*|| previewData.curData.size() < 1*/)
+        return false;
+
+    return true;
+}
+
+void Model::addCompletePreviewDataToLines()
+{
+    //  必须是complete，这里不做校验，由调用者保证
+
+    list<Line> lstLine;
+    previewData.getCompleteLines(lstLine);
+
+    ExcuteAction(lstLine);
+
+}
+
+void Model::ExcuteAction(const list<Line>& lstLine)
+{
+    //if (previewData.curveType == GLCurveType::GLPoint)
+    //{
+    //    if (ViewerSetting::viewerStatus == ViewerStatus::CSphere)
+    //    {
+    //        CreateSphere(1000.0 * lstLine.begin()->pt1 + bottomOffset * currentWorkPlNormal);
+    //        return;
+    //    }
+    //}
+
+    ////  copy等只需要预览的，在“画线”操作完成后执行copy
+    //if (previewData.curveType == GLCurveType::GLTemp)
+    //{
+    //    if (ViewerSetting::viewerStatus == ViewerStatus::Copy)
+    //    {
+    //        if (!basePt4Copy)
+    //            basePt4Copy = new Vector3f(lstLine.back().pt0);
+
+    //        Vector3f offset = lstLine.back().pt1 - *basePt4Copy;
+    //        CopySelectedData(offset);
+    //        return;
+    //    }
+    //    else if (ViewerSetting::viewerStatus == ViewerStatus::DrawingImage)
+    //    {
+    //        Vector3f dirX = lstLine.back().pt1 - lstLine.back().pt0;
+    //        double len = dirX.Length();
+
+    //        int imageWid = 0, imageHei = 0;
+    //        getImageSize(currentImageFile, imageWid, imageHei);
+
+    //        double ratio = ((double)imageHei) / imageWid;
+    //        double height = len * ratio;
+
+    //        dirX.Normalize();
+    //        Vector3f dirY = currentWorkPlNormal.CrossProduct(dirX);
+    //        dirY.Normalize();
+    //        Vector3f insert = 0.5 * (lstLine.back().pt1 + lstLine.back().pt0) + dirY * (0.5 * height);
+
+    //        double scale = 1000.0 * len / imageWid;
+    //        UpdateImageInfo(currentImageFile, imageWid, imageHei, dirX, dirY, currentWorkPlNormal, 1000.0 * insert, scale);
+    //        return;
+    //    }
+    //}
+
+    drawingLinesholder->pushCurveData(previewData.curveType, lstLine);
+}
+
+void Model::getOrthogonalityPoint(Vector3f& cur)
+{
+    if (!orthogonalityMode || previewData.curData.empty())
+        return;
+
+    //  TODO 需要把局部坐标系存到工作平面中，统一规范使用
+    Vector3f localX, localY;
+    CGUtils::getLocalXY(currentWorkPlNormal, localX, localY);
+
+    auto& pre = previewData.curData.back().pValue;
+    Vector3f dir = cur - pre;
+
+    Vector3f paraAxis = ViewerUtils::normalizeToAxis(dir, localX, localY, currentWorkPlNormal);
+    cur = pre + dir.DotProduct(paraAxis) * paraAxis;
+}
+
+//////////////////////////////////////
+
 
 void Model::setupWorkPlaneMesh()
 {

@@ -1,15 +1,29 @@
 #include "glview.h"
 #include <QMessageBox>
+#include "Command.h"
 
 GLView::GLView(QWidget *parent)
-    : QOpenGLWidget{parent}
+    : QOpenGLWidget{ parent }, currentMousePos{0}
 {
+    // set focus policy to threat QContextMenuEvent from keyboard  
+    setFocusPolicy(Qt::StrongFocus);
+
+    // Enable the mouse tracking, by default the mouse tracking is disabled.
+    setMouseTracking(true);
+
     //  y-up to z-up
     m_modelMatrix = QMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 0.0f, -1.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f);//(1.0f);
     m_modelMatrix = m_modelMatrix.transposed();
+
+    m_commandPara = new CommandPara();
+
+    paraInput = new QLineEdit(this);
+    paraInput->setFixedSize(80, 16);
+    paraInput->hide();
+    paraInput->setFocus();
 
 }
 
@@ -34,6 +48,7 @@ void GLView::initializeGL()
 
     m_model = new Model(this);
     m_camera.lastFrame = QTime::currentTime().msecsSinceStartOfDay() / 1000.0;
+    auto& defaultLayer = LayerCache::getDefaultLayer();
 
 }
 
@@ -158,6 +173,21 @@ bool GLView::event(QEvent* e)
         }
     }
 
+    else if (e->type() == QEvent::KeyPress)
+    {
+        auto event = static_cast<QKeyEvent*>(e);
+        onKeyPress(event);
+    }
+    else if (e->type() == QEvent::MouseMove)
+    {
+        auto event = static_cast<QMouseEvent*>(e);
+        onMouseMove(event);
+    }
+    else if (e->type() == QEvent::MouseButtonRelease)
+    {
+        onMouseButtonRelease();
+    }
+
     if (m_camera.handle(e))
         update();
 
@@ -174,13 +204,202 @@ void GLView::onMouseLeftPress(QMouseEvent* event)
         m_camera.FitView(flag);
         return;
     }
+
+    int nStatus = ViewerSetting::IsStatusNeedDraw(ViewerSetting::viewerStatus);
+    if (nStatus != -1 && nStatus != 4)
+    {
+        if (!m_model->previewData.previewNextPt)  //在连续点击的情况下（有时候mouse mouve还没有触发），previewNextPt会出现为null的情况
+            updatePreviewNextPoint(event);
+
+        m_commandPara->Init();
+        if (ViewerCommand::OnMouseLeftDown("", m_model->previewData.previewNextPt, nullptr, *m_commandPara))
+        {
+            if (m_commandPara->vType != -1)
+                m_model->AddVertexToLines(*m_commandPara);
+
+            OnCommandExcuted();
+        }
+    }
+}
+
+void GLView::onKeyPress(QKeyEvent* event)
+{
+    int eKey = event->key();
+    if (eKey == Qt::Key::Key_Escape)
+    {
+        ViewerSetting::viewerStatus = ViewerStatus::Unknown;
+        m_model->previewData.clear();
+        m_model->ClearInvalidData();
+
+        m_commandPara->Init();
+        ViewerCommand::Init();
+
+        OnCommandExcuted(false);
+    }
+    else if (eKey == Qt::Key::Key_F8)
+    {
+        if (QGuiApplication::keyboardModifiers() == Qt::ControlModifier)
+            m_model->orthogonalityMode = !m_model->orthogonalityMode;
+    }
+    else if (eKey == Qt::Key::Key_F9)
+    {
+        if (QGuiApplication::keyboardModifiers() == Qt::ControlModifier)
+            m_model->snapMode = !m_model->snapMode;
+    }
+    else if (eKey == Qt::Key::Key_Enter || eKey == Qt::Key::Key_Return)
+    {
+        tryToExcuteCommandOnValidKeyPress();
+    }
+}
+
+bool GLView::tryToExcuteCommandOnValidKeyPress()
+{
+    if (paraInput->text().isEmpty())
+        return false;
+
+    int nStatus = ViewerSetting::IsStatusNeedDraw(ViewerSetting::viewerStatus);
+    if (nStatus != -1 && nStatus != 4 && m_model->isLinePreviewValid())
+    {
+        QVector3D hitPt;
+        if (getRayIntersection(currentMousePos[0], currentMousePos[1], hitPt))
+        {
+            Vector3f pt(hitPt.x(), hitPt.y(), hitPt.z());
+            m_model->getOrthogonalityPoint(pt);
+
+            //auto lastVPt = m_model->previewData.curData.empty() ? nullptr : &m_model->previewData.curData.back().pValue;
+            auto lastVPt = m_model->previewData.GetCurLastValidPoint();
+            m_commandPara->Init();
+            if (ViewerCommand::OnKeyEnterDown(paraInput->text().toStdString(), &pt, lastVPt, *m_commandPara))
+            {
+                if (m_commandPara->vType != -1)
+                    m_model->AddVertexToLines(*m_commandPara);
+
+                OnCommandExcuted();
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void GLView::onMouseMove(QMouseEvent* event)
+{
+    currentMousePos[0] = event->x();
+    currentMousePos[1] = event->y();
+
+    int nStatus = ViewerSetting::IsStatusNeedDraw(ViewerSetting::viewerStatus);
+    if (nStatus != -1 && m_model->isLinePreviewValid())
+    {
+        UpdateParaInputPos(event->x(), event->y());
+
+        updatePreviewNextPoint(event);
+    }
+    //else if (m_model->isSelectMode && (event->buttons() & Qt::LeftButton))
+    //{
+    //    //  rect select
+    //    if (!m_model->rectSelectStart)
+    //    {
+    //        m_model->rectSelectStart = new Vector2f();
+    //        m_model->rectSelectStart->SetValue(event->x(), event->y());
+    //    }
+    //    else
+    //    {
+    //        if (!m_model->rectSelectEnd)
+    //            m_model->rectSelectEnd = new Vector2f();
+    //        m_model->rectSelectEnd->SetValue(event->x(), event->y());
+    //    }
+    //}
+}
+
+void GLView::onMouseButtonRelease()
+{
+    /*if (m_model->isSelectMode && m_model->rectSelectStart && m_model->rectSelectEnd)
+    {
+        bool ctrlPressed = QGuiApplication::keyboardModifiers() == Qt::ControlModifier;
+        if (!ctrlPressed)
+            m_model->ClearSelected();
+
+        Body rectData;
+        getWCSRectSelectBox(*m_model->rectSelectStart, *m_model->rectSelectEnd, { 0, 0, m_camera.SCR_WIDTH, m_camera.SCR_HEIGHT }, m_modelMatrix.inverted(), m_camera.GetViewMatrix().inverted(), m_projection.inverted(), rectData);
+        m_model->UpdateSelectInfo(rectData);
+
+        delete m_model->rectSelectStart;
+        m_model->rectSelectStart = nullptr;
+        delete m_model->rectSelectEnd;
+        m_model->rectSelectEnd = nullptr;
+    }*/
 }
 
 /////////////////////////////////////////////
 
+GLCurveType getCurveType(ViewerStatus status)
+{
+    if (status == ViewerStatus::DrawingLines)
+        return GLCurveType::GLLine;
+    if (status == ViewerStatus::DrawingArc)
+        return GLCurveType::GLArc;
+    if (status == ViewerStatus::DrawingCircle)
+        return GLCurveType::GLCircle;
+    if (status == ViewerStatus::DrawingRectangle)
+        return GLCurveType::GLRectangle;
+    if (status == ViewerStatus::Unknown)
+        return GLCurveType::GLUnknown;
+    if (status == ViewerStatus::Copy ||
+        status == ViewerStatus::DrawingImage)
+        return GLCurveType::GLTemp;
+    if (status == ViewerStatus::CSphere ||
+        status == ViewerStatus::SetWorkPlane)
+        return GLCurveType::GLPoint;
+    return GLCurveType::GLUnknown;
+}
+
 void GLView::drawLine()
 {
-    QMessageBox::information(NULL, "Title", "Content", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    //QMessageBox::information(NULL, "Title", "Content", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    makeCurrent();
+    drawCurve(ViewerStatus::DrawingLines, -1);
+    doneCurrent();
+    update();
+}
+
+void GLView::drawCurve(ViewerStatus status, int drawType /*= -1*/)
+{
+    ViewerSetting::viewerStatus = status;
+    //if (m_model->lines.at(m_model->norDefualt).empty())
+    //    throw exception("draw curve error.");
+    m_model->BeginToDrawLines(getCurveType(status), drawType);
+
+    ViewerCommand::ActiveCommand(status, drawType);
+    OnStatusMessageChanged(ViewerCommand::GetCommandStatus());
+
+    OnCommandStart();
+}
+
+void GLView::updatePreviewNextPoint(QMouseEvent* event)
+{
+    QVector3D hitPt;
+    if (getRayIntersection(event->x(), event->y(), hitPt))
+    {
+        //  test
+        //if (hitPt.z() != 0.0f)
+        //    throw exception("test.");
+
+        Vector3f pt(hitPt.x(), hitPt.y(), hitPt.z());
+        m_model->getOrthogonalityPoint(pt);
+        m_model->SetPreviewNextPoint(pt.X, pt.Y, pt.Z);
+    }
+}
+
+bool GLView::getRayIntersection(int px, int py, QVector3D& hitPt)
+{
+    QVector3D rayOri, rayEnd;
+    ViewerUtils::getPickRay(px, py, { 0, 0, m_camera.SCR_WIDTH, m_camera.SCR_HEIGHT }, m_camera.Position, m_modelMatrix.inverted(), m_camera.GetViewMatrix().inverted(), m_projectionMat.inverted(), rayOri, rayEnd);
+
+    //CGUTILS::Plane plane(Vector3d::Zero, Vector3d::BasicZ);
+    CGUTILS::Plane plane(m_model->currentWorkPlPoint / 1000.0, m_model->currentWorkPlNormal);
+
+    return ViewerUtils::getIntersection(rayOri/*m_camera.Position*/, rayEnd, plane, hitPt);
 }
 
 /////////////////////////////////////////////
@@ -235,5 +454,34 @@ void GLView::getViewCubeProjectOffset(QMatrix4x4& offViewCube)
 
     offViewCube.translate(rU);
     //offViewCube = m_modelMatrix * offViewCube;
+}
+
+void GLView::UpdateParaInputPos(int px, int py)
+{
+    paraInput->move(px + 10, py);
+}
+
+void GLView::OnCommandExcuted(bool onlyMove /* = true*/)
+{
+    OnStatusMessageChanged(ViewerCommand::GetCommandStatus());
+    paraInput->setText("");
+
+    if (onlyMove)
+    {
+        paraInput->setFocus();
+        //paraInput->move(-100, -100);
+    }
+    else
+    {
+        setFocus();
+        paraInput->hide();
+    }
+}
+
+void GLView::OnCommandStart()
+{
+    paraInput->setText("");
+    paraInput->show();
+    paraInput->setFocus();
 }
 

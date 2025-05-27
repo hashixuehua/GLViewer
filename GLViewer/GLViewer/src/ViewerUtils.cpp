@@ -94,6 +94,78 @@ void ViewerUtils::getPickRay(int px, int py, const QRect& viewport_rect, QVector
     //vec3 ray_dir = normalise(ray_world.xyz - camera_position);
 }
 
+bool ViewerUtils::getIntersection(const QVector3D& rayOri, const QVector3D& rayEnd, const Plane& plane, QVector3D& inter)
+{
+    Vector3f ori(rayOri.x(), rayOri.y(), rayOri.z());
+    Vector3f to(rayEnd.x(), rayEnd.y(), rayEnd.z());
+
+    double dis = CurveTool::distanceToUnboundPlane2(Vector3f::Zero, plane.mNormal, plane.mCenter);
+    bool node1Out;
+    Vector3f cInter;
+    if (CurveTool::PlaneCutLine(ori, to, plane.mNormal, dis, cInter, node1Out) != 2)
+        return false;
+
+    inter.setX(cInter.X);
+    inter.setY(cInter.Y);
+    inter.setZ(cInter.Z);
+    /*
+    double t;
+    if (!CGUtils::IsRayHitPlane(plane.mCenter, plane.mNormal, ori, dir, t))
+        return false;
+
+    inter = rayOri + rayDir * t;*/
+    return true;
+}
+
+//////
+
+bool ViewerUtils::isNumber(const std::string& str)
+{
+    bool hasDigit = false;
+    bool hasDecimal = false;
+    bool hasSign = false;
+
+    for (char c : str) {
+        if (std::isdigit(c)) {
+            hasDigit = true;
+        }
+        else if (c == '.') {
+            if (hasDecimal) return false; // 小数点只能出现一次
+            hasDecimal = true;
+        }
+        else if (c == '+' || c == '-') {
+            if (hasSign && !hasDigit) return false; // 符号只能出现在最前面
+            hasSign = true;
+        }
+        else {
+            return false; // 其他字符无效
+        }
+    }
+
+    // 至少需要一个数字
+    return hasDigit && !(hasDecimal && !str.back() == '.'); // 防止结尾是小数点
+}
+
+void ViewerUtils::Stringsplit(const std::string& str, const std::string& split, vector<std::string>& res)
+{
+    char* strc = new char[str.size() + 1];
+    strcpy(strc, str.c_str());   // 将str拷贝到 char类型的strc中
+    char* temp = strtok(strc, split.c_str());
+    while (temp != NULL)
+    {
+        res.push_back(std::string(temp));
+        temp = strtok(NULL, split.c_str());	// 下一个被分割的串
+    }
+    delete[] strc;
+}
+
+void ViewerUtils::Stringsplit(const std::string& str, const char split, vector<std::string>& res)
+{
+    Stringsplit(str, std::string(1, split), res);	// 调用上一个版本的Stringsplit()
+}
+
+//////
+
 QOpenGLTexture* ViewerUtils::getOrCreateImageTexture(const QString& imageFile, bool reverse/* = false*/)
 {
     auto itrFind = mapImagePath2Texture.find(imageFile);

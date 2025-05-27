@@ -9,6 +9,9 @@
 
 #include "CGLibUtils.h"
 #include "ViewerUtils.h"
+#include "ViewerSetting.h"
+
+#include "DrawingLinesHolder.h"
 
 using namespace std;
 using namespace CGUTILS;
@@ -23,6 +26,16 @@ public:
     void Draw2(QOpenGLShaderProgram& shader);
     void DrawViewElement(QOpenGLShaderProgram& shader, const string& name);
 
+    //  for curve drawing
+    void BeginToDrawLines(GLCurveType curveType, int drawType = -1);
+    void AddVertexToLines(const CommandPara& para);
+    void SetPreviewNextPoint(double x, double y, double z);
+    bool isLinePreviewValid();
+
+    void getOrthogonalityPoint(Vector3f& cur);
+
+    void ClearInvalidData();
+
     //
     const BodyInfo* GetViewCubeBody();
 
@@ -34,7 +47,25 @@ private:
     void setupViewCube();
     void setupMouse();
 
+    void addCompletePreviewDataToLines();
+    void ExcuteAction(const list<Line>& lstLine);
+
     shared_ptr<Mesh> ConvertMesh(const TriangleMesh& mesh);
+
+public:
+    //  preview
+    //Vector3f* previewNextPt;
+    PeviewData previewData;
+
+    //  捕捉
+    bool snapMode;
+
+    //  正交模式
+    bool orthogonalityMode;
+
+    //  工作平面
+    Vector3f currentWorkPlPoint = Vector3f::Zero;
+    Vector3f currentWorkPlNormal = Vector3f::BasicZ;
 
 private:
     // 顶点的数据
@@ -54,6 +85,8 @@ private:
     //  mesh for viewer
     map<string, MeshInfo> mapName2VMesh;
     map<string, BodyInfo> mapName2VBody;
+
+    DrawingLinesHolder* drawingLinesholder;
 
 };
 

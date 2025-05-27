@@ -1,3 +1,71 @@
 #include "ViewerSetting.h"
 
 float ViewerSetting::devicePixelRatio = 1.0;
+ViewerStatus ViewerSetting::viewerStatus = ViewerStatus::Unknown;
+
+int ViewerSetting::IsStatusNeedDraw(ViewerStatus status)
+{
+    if (status == ViewerStatus::DrawingLines ||
+        status == ViewerStatus::Copy ||
+        status == ViewerStatus::DrawingImage)
+        return 1;//line
+    else if (status == ViewerStatus::DrawingArc)
+        return 2;//arc
+    else if (status == ViewerStatus::CSphere)
+        return 3;//point
+    else if (status == ViewerStatus::SetWorkPlane)
+        return 4;//point bfor set work plane
+    else if (status == ViewerStatus::DrawingCircle)
+        return 5;
+    else if (status == ViewerStatus::DrawingRectangle)
+        return 6;
+
+    return -1;
+}
+
+////////////////////////
+
+string LayerCache::currentLayer = "";
+map<string, LayerData> LayerCache::mapName2Layer;
+string LayerCache::prefixOfLayerName = "Layer";
+int LayerCache::layerCodeNum = -1;
+
+const LayerData& LayerCache::getCurrentLayer()
+{
+    return mapName2Layer.at(currentLayer);
+}
+
+const LayerData& LayerCache::getLayer(const string& layerName)
+{
+    return getLayer2(layerName);
+}
+
+LayerData& LayerCache::getLayer2(const string& layerName)
+{
+    auto itrFind = mapName2Layer.find(layerName);
+    if (itrFind == mapName2Layer.end())
+    {
+        throw exception("error.");
+        //return getCurrentLayer();
+    }
+
+    return itrFind->second;
+}
+
+const LayerData& LayerCache::getDefaultLayer()
+{
+    string defaultLN = prefixOfLayerName + std::to_string(0);
+    auto itrFind = mapName2Layer.find(defaultLN);
+    if (itrFind == mapName2Layer.end())
+    {
+        mapName2Layer.insert(make_pair(defaultLN, LayerData(defaultLN, Vector3i(255, 0, 0), "deault")));
+        layerCodeNum = 0;
+        currentLayer = defaultLN;
+    }
+
+    return mapName2Layer.at(defaultLN);
+}
+
+//////
+
+
