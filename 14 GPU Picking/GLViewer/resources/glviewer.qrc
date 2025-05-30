@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+		<file>viewcube.png</file>
+		<file>rotateLabel.png</file>
+		<file>line.png</file>
+		<file>arc.png</file>
+		<file>arc2.png</file>
+		<file>circle.png</file>
+		<file>rectangle.png</file>
+		<file>drawImage.png</file>
+    </qresource>
+</RCC>

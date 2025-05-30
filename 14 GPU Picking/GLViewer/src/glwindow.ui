@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GLWindow</class>
+ <widget class="QMainWindow" name="GLWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>GLWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="GLView" name="openGLWidget">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>100</y>
+      <width>371</width>
+      <height>261</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuDraw">
+    <property name="title">
+     <string>Draw</string>
+    </property>
+    <addaction name="actionLine"/>
+    <addaction name="actionArc"/>
+    <addaction name="actionArc2"/>
+	<addaction name="actionCircle"/>
+    <addaction name="actionRectangle"/>
+    <addaction name="actionImage"/>
+   </widget>
+   <addaction name="menuDraw"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLine"/>
+   <addaction name="separator"/>
+   <addaction name="actionArc"/>
+   <addaction name="separator"/>
+   <addaction name="actionArc2"/>
+   <addaction name="separator"/>
+   <addaction name="actionCircle"/>
+   <addaction name="separator"/>
+   <addaction name="actionRectangle"/>
+   <addaction name="separator"/>
+   <addaction name="actionImage"/>
+   <addaction name="separator"/>
+  </widget>
+  <action name="actionLine">
+   <property name="icon">
+    <iconset resource="../resources/glviewer.qrc">
+     <normaloff>:/line.png</normaloff>:/line.png</iconset>
+   </property>
+   <property name="text">
+    <string>Line</string>
+   </property>
+   <property name="toolTip">
+    <string>draw lines</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionArc">
+   <property name="icon">
+    <iconset resource="../resources/glviewer.qrc">
+     <normaloff>:/arc.png</normaloff>:/arc.png</iconset>
+   </property>
+   <property name="text">
+    <string>Arc</string>
+   </property>
+   <property name="toolTip">
+    <string>draw arc by start,end and on-arc point</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionArc2">
+   <property name="icon">
+    <iconset resource="../resources/glviewer.qrc">
+     <normaloff>:/arc2.png</normaloff>:/arc2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Arc2</string>
+   </property>
+   <property name="toolTip">
+    <string>draw arc by center,start and end point</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionCircle">
+   <property name="icon">
+    <iconset resource="../resources/glviewer.qrc">
+     <normaloff>:/circle.png</normaloff>:/circle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Circle</string>
+   </property>
+   <property name="toolTip">
+    <string>draw circle by center and radius</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionRectangle">
+   <property name="icon">
+    <iconset resource="../resources/glviewer.qrc">
+     <normaloff>:/rectangle.png</normaloff>:/rectangle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rectangle</string>
+   </property>
+   <property name="toolTip">
+    <string>draw rectangle using two diagonal points</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionImage">
+   <property name="icon">
+    <iconset resource="../resources/glviewer.qrc">
+     <normaloff>:/drawImage.png</normaloff>:/drawImage.png</iconset>
+   </property>
+   <property name="text">
+    <string>Image</string>
+   </property>
+   <property name="toolTip">
+    <string>draw image</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GLView</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">glview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources/glviewer.qrc"/>
+ </resources>
+ <connections/>
+</ui>
