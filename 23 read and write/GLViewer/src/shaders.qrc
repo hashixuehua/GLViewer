@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+		<file>shader/1.model_loading.frag</file>
+        <file>shader/1.model_loading.vert</file>
+		<file>shader/1.model_loading_texture.frag</file>
+        <file>shader/1.model_loading_texture.vert</file>
+		<file>shader/Selection.frag</file>
+    </qresource>
+</RCC>
