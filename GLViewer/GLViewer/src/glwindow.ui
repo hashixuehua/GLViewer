@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>GLWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resources/glviewer.qrc">
+    <normaloff>:/about.png</normaloff>:/about.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="GLView" name="openGLWidget">
     <property name="geometry">
@@ -50,8 +54,8 @@
      <string>Setting</string>
     </property>
     <addaction name="actionWorkPlane"/>
-	<addaction name="actionLayer"/>
-	<addaction name="actionWireframe"/>
+    <addaction name="actionLayer"/>
+    <addaction name="actionWireframe"/>
    </widget>
    <widget class="QMenu" name="menuControl">
     <property name="title">
@@ -59,15 +63,15 @@
     </property>
     <addaction name="actionRectSelect"/>
     <addaction name="actionCopy"/>
-	<addaction name="actionDelete"/>
-	<addaction name="actionShowOrHideLines"/>
-	<addaction name="actionShowOrHideModel"/>
+    <addaction name="actionDelete"/>
+    <addaction name="actionShowOrHideLines"/>
+    <addaction name="actionShowOrHideModel"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
-	<addaction name="actionWebsite"/>
+    <addaction name="actionWebsite"/>
     <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuDraw"/>
