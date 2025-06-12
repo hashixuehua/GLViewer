@@ -23,3 +23,9 @@ Vector3f ViewerUtils::normalizeToAxis(const Vector3f& dir, const Vector3f& local
     else// if (angleZ < angleX && angleZ < angleY)
         return bTZ ? -localZ : localZ;
 }
+
+////////////
+
+string ViewerCache::defaultWorkPlane = "defaultWorkPlane";
+string ViewerCache::currentWorkPlane = "currentWorkPlane";
+

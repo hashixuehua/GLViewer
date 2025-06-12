@@ -5,6 +5,14 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLFunctions_4_5_Core>
 
+#include <CGLib/TriangleMesh.h>
+
+#include "CGLibUtils.h"
+#include "ViewerUtils.h"
+
+using namespace std;
+using namespace CGUTILS;
+
 class Model
 {
 public:
@@ -12,13 +20,21 @@ public:
     ~Model();
 
     void Draw(QOpenGLShaderProgram& shader);
+    void Draw2(QOpenGLShaderProgram& shader);
+
+private:
+    void drawWorkPlane(QOpenGLShaderProgram& shader);
+    void GetWorkPlaneMesh(const WorkPlanePara& workPlane, TriangleMesh& mesh);
+
+    void setupWorkPlaneMesh();
+    shared_ptr<Mesh> ConvertMesh(const TriangleMesh& mesh);
 
 private:
     // 顶点的数据
     float vertices[18] = {
-        -0.5f, -0.5f, 0.f, 0.f, 0.f, 1.f,
-        0.5f, -0.5f, 0.f, 0.f, 0.f, 1.f,
-        0.0f,  0.5f, 0.f, 0.f, 0.f, 1.f
+        -0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f,
+        0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f,
+        0.0f,  0.5f, 1.f, 0.f, 0.f, 1.f
     };
 
     unsigned int indices[3]{ 0, 1, 2 };
@@ -27,6 +43,9 @@ private:
 
     QOpenGLVertexArrayObject m_VAO;
     QOpenGLBuffer m_VBO, m_EBO;
+
+    //  mesh for viewer
+    map<string, MeshInfo> mapName2VMesh;
 
 };
 
