@@ -44,6 +44,7 @@ else()
     endif()
 endif()
 
+target_include_directories(GLViewer PRIVATE .)
 target_link_libraries(GLViewer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::OpenGLWidgets)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
