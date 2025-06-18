@@ -192,7 +192,7 @@ void constructLines(int drawType, const Vector3f& planeNormal, const vector<Comm
     {
         //  转到局部坐标系
         Transform trsW2L;
-        Transform::GetInverse(*trs, trsW2L);
+        Transform::CalInverse(*trs, trsW2L);
 
         for (auto& para : source)
         {
