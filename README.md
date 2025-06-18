@@ -28,8 +28,8 @@ you can learn more on **[Setup the development environment of GLViewer](https://
 >5. build and run.
 
 >**important**
->    it is recommended to **star** this repository, it is important to us.
->    建议对仓库进行**star**，这对我们很重要。
+> + it is recommended to **star** this repository, it is important to us.
+> + 建议对仓库进行**star**，这对我们很重要。
 
 # How to Sponsor
 Here's how you can sponsor the author:
