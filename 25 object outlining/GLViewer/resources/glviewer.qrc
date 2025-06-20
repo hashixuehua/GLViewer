@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/">
+		<file>viewcube.png</file>
+		<file>rotateLabel.png</file>
+		<file>line.png</file>
+		<file>arc.png</file>
+		<file>arc2.png</file>
+		<file>circle.png</file>
+		<file>rectangle.png</file>
+		<file>drawImage.png</file>
+		<file>workPlane.png</file>
+		<file>rect-select.png</file>
+		<file>copy.png</file>
+		<file>delete.png</file>
+		<file>showOrHideLines.png</file>
+		<file>showOrHideModel.png</file>
+		<file>layer.png</file>
+		<file>wireframe.png</file>
+		<file>about.png</file>
+		<file>layer.png</file>
+		<file>website.png</file>
+		<file>wechat.png</file>
+		<file>open.png</file>
+		<file>save.png</file>
+    </qresource>
+</RCC>
