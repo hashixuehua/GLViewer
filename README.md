@@ -11,7 +11,7 @@
 If you want to learn the technical and code logic of the course, ***you can visit the [www.cglib.net](https://www.cglib.net) website, where you can find the full and free course documentation***.
 
 > + It is worth mentioning that the author ***recorded a detailed video explanation course***, the video course will help you fully learn and master the technology of this project.
-> + if you have the conditions, it is recommended to buy the video course on [哔哩哔哩bilibili](https://space.bilibili.com/386294314) or [CSDN](https://edu.csdn.net/course/detail/40091)
+> + if you have the conditions, it is recommended to buy the video course on [哔哩哔哩bilibili](https://www.bilibili.com/cheese/play/ss168681371) or [CSDN](https://edu.csdn.net/course/detail/40091)
 
 you can learn more infomation on the [www.cglib.net](https://www.cglib.net) website.
 
@@ -34,8 +34,8 @@ you can learn more on **[Setup the development environment of GLViewer](https://
 # How to Sponsor
 Here's how you can sponsor the author:
 
-> + Sponsorships can be done via [OpenCollective](https://opencollective.com/cglib)
-> + or `buy video course` on [哔哩哔哩bilibili](https://space.bilibili.com/386294314) or [CSDN](https://edu.csdn.net/course/detail/40091)
+> + Sponsorships can be done via [paypal](https://www.paypal.com/paypalme/cglib)
+> + or `buy video course` on [哔哩哔哩bilibili](https://www.bilibili.com/cheese/play/ss168681371) or [CSDN](https://edu.csdn.net/course/detail/40091)
 > + or use `WeChat` to follow the author's `WeChat public account`(微信公众号 `哈市雪花`) and open any article to sponsor.
 
 # License
