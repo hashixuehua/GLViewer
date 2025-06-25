@@ -1,6 +1,10 @@
 #pragma once
 #define RAPIDJSON_HAS_STDSTRING 1
 
+#include <vector>
+#include <fstream>
+#include <list>
+
 // RapidJSON uses constant if expressions to support multiple platforms
 #pragma warning(push)
 #pragma warning(disable:4127)
@@ -15,9 +19,9 @@
 #include <rapidjson/pointer.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
-#include <jsonUtils/JsonUtils.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/ostreamwrapper.h>
 
-#include <list>
 #include "CGUtils/CGUtils.h"
 #include "ViewerSetting.h"
 #include "ViewerUtils.h"
@@ -32,5 +36,7 @@ public:
 	static void DeserializeFromJson(const wstring& filePath, list<pair<string, list<pair<Vector3f, list<Line>>>>>& lstLayerName2lstNormal2Lines);
 	static void SerializeToJson(const map<PointData_1e_3, vector<CurveData*>>& lines, const wstring& filePath);
 
+    static bool ReadFileToJson(const std::wstring& filePath, rapidjson::Document& document);
+    static bool SaveJsonToFile(const rapidjson::Document& document, const std::wstring& filePath);
 
 };

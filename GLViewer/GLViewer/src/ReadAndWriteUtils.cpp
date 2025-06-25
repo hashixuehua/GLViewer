@@ -207,7 +207,7 @@ void FillLineData(const map<string, map<PointData_1e_3, vector<CurveData*>>>& ma
 void ReadAndWriteUtils::DeserializeFromJson(const wstring& filePath, list<pair<string, list<pair<Vector3f, list<Line>>>>>& lstLayerName2lstNormal2Lines)
 {
     Document docJson(rapidjson::kArrayType);
-    JsonUtils::ReadFileToJson(filePath, docJson);
+    ReadFileToJson(filePath, docJson);
 
     if (docJson.IsArray())
     {
@@ -281,6 +281,41 @@ void ReadAndWriteUtils::SerializeToJson(const map<PointData_1e_3, vector<CurveDa
         FillLinesItemData(lines, docJson, allocator);
     }
 
-    JsonUtils::SaveJsonToFile(docJson, filePath);
+    SaveJsonToFile(docJson, filePath);
+}
+
+bool ReadAndWriteUtils::ReadFileToJson(const std::wstring& filePath, rapidjson::Document& document)
+{
+    std::ifstream in;
+#if defined(WIN32)||defined(_WIN32)
+    in.open(filePath, std::ifstream::in);
+#else 
+    in.open(UnicodeToUtf8(filePath.c_str()), std::ifstream::in);
+#endif
+    if (!in.is_open())
+        return false;
+
+    rapidjson::IStreamWrapper inWrapper(in);
+    document.ParseStream<rapidjson::IStreamWrapper>(inWrapper);
+    in.close();
+    return true;
+}
+
+bool ReadAndWriteUtils::SaveJsonToFile(const rapidjson::Document& document, const std::wstring& filePath)
+{
+    std::ofstream out;
+#if defined(WIN32)||defined(_WIN32)
+    out.open(filePath, std::ifstream::out);
+#else 
+    out.open(UnicodeToUtf8(filePath.c_str()), std::ifstream::in);
+#endif
+    if (out.fail())
+        return false;
+
+    rapidjson::OStreamWrapper outWrapper(out);
+    rapidjson::Writer<rapidjson::OStreamWrapper> writer(outWrapper);
+    document.Accept(writer);
+    out.close();
+    return true;
 }
 

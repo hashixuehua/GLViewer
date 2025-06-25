@@ -285,6 +285,11 @@ void GLView::onMouseLeftPress(QMouseEvent* event)
     {
         if (!ViewerSetting::previewData.previewNextPt)  //在连续点击的情况下（有时候mouse mouve还没有触发），previewNextPt会出现为null的情况
             updatePreviewNextPoint(event);
+        if (!ViewerSetting::previewData.previewNextPt)
+        {
+            QMessageBox::warning(this, "Warning!", "Please click on current workplane, you can rotate the view by moving on pressing left mouse.");
+            return;
+        }
 
         m_commandPara->Init();
         if (ViewerCommand::OnMouseLeftDown("", ViewerSetting::previewData.previewNextPt, nullptr, *m_commandPara))
