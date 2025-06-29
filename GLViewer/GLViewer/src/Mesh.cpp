@@ -13,8 +13,8 @@ Mesh::Mesh(QOpenGLFunctions_4_5_Core* glFunc)
 
 Mesh::Mesh(QOpenGLFunctions_4_5_Core* glFunc, const std::vector<Vertex>& verts, const std::vector<unsigned int>& indis, const std::vector<Texture*>& texts,
     const std::vector<unsigned int>& edgs)
-    : edgeColor(0.0f, 1.0f, 1.0f, 1.0f)
-    , m_glFunc(glFunc)
+    : /*edgeColor(0.0f, 1.0f, 1.0f, 1.0f)
+    , */m_glFunc(glFunc)
     , m_VBO(QOpenGLBuffer::VertexBuffer)
     , m_EBO(QOpenGLBuffer::IndexBuffer)
     , m_EBOEdge(QOpenGLBuffer::IndexBuffer)
@@ -39,7 +39,7 @@ Mesh::~Mesh()
 
 void Mesh::DrawWireframe(QOpenGLShaderProgram& shader)
 {
-    shader.setUniformValue("objectColor", 0.f, 0.f, 0.f, 1.f);
+    shader.setUniformValue("objectColor", Setting::wireframeColor);
     m_glFunc->glLineWidth(1.0f);
     QOpenGLVertexArrayObject::Binder bind2(&m_VAOEdge);
     m_glFunc->glDrawElements(GL_LINES, static_cast<unsigned int>(edges.size()), GL_UNSIGNED_INT, 0);
@@ -84,7 +84,7 @@ void Mesh::Draw(QOpenGLShaderProgram &shader, bool wireFrame/* = false*/)
     // 画边线
     //  Test  重新构造边线VAO
     //shader.setUniformValue("objectColor", 1.0f, 1.0f, 1.0f);
-    shader.setUniformValue("objectColor", edgeColor);
+    shader.setUniformValue("objectColor", Setting::edgeLineColor/*edgeColor*/);
     //m_glFunc->glLineWidth(2.0f);
     //vector<unsigned int> lineArray{0, 1, 2, 3, 4, 5};
     //int temp = static_cast<unsigned int>(indices.size()) / 2;
@@ -94,47 +94,47 @@ void Mesh::Draw(QOpenGLShaderProgram &shader, bool wireFrame/* = false*/)
     //glDrawElements(GL_LINES, static_cast<unsigned int>(edges.size()), GL_UNSIGNED_INT, 0);
 }
 
-void Mesh::Draw(QOpenGLShaderProgram *shader)
-{
-    if (!onlyEdge)
-    {
-        unsigned int diffuseNr = 1;
-        unsigned int specularNr = 1;
-        unsigned int normalNr = 1;
-        unsigned int heightNr = 1;
-
-        for (unsigned int i = 0; i < textures.size(); ++i) {
-            m_glFunc->glActiveTexture(GL_TEXTURE0 + i); // 在绑定之前激活相应的纹理单元
-            // 获取纹理序号（diffuse_textureN 中的 N）
-            QString number;
-            QString name = textures[i]->type;
-            if (name == "texture_diffuse")
-                number = QString::number(diffuseNr++);
-            else if (name == "texture_specular")
-                number = QString::number(specularNr++);
-            else if (name == "texture_normal")
-                number = QString::number(normalNr++);
-            else if (name == "texture_height")
-                number = QString::number(heightNr++);
-            textures[i]->texture.bind();
-            shader->setUniformValue((name + number).toStdString().c_str(), i);
-        }
-        // 画网格
-        QOpenGLVertexArrayObject::Binder bind(&m_VAO);
-        m_glFunc->glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    }
-
-    // 画边线
-    //  Test  重新构造边线VAO
-    shader->setUniformValue("objectColor", 1.0f, 1.0f, 1.0f, 0.8f);
-    m_glFunc->glLineWidth(2.0f);
-    //vector<unsigned int> lineArray{0, 1, 2, 3, 4, 5};
-    //int temp = static_cast<unsigned int>(indices.size()) / 2;
-    QOpenGLVertexArrayObject::Binder bind2(&m_VAOEdge);
-    m_glFunc->glDrawElements(GL_LINES, static_cast<unsigned int>(edges.size()), GL_UNSIGNED_INT, 0);
-    //glBindVertexArray(VAOEdge);
-    //glDrawElements(GL_LINES, static_cast<unsigned int>(edges.size()), GL_UNSIGNED_INT, 0);
-}
+//void Mesh::Draw(QOpenGLShaderProgram *shader)
+//{
+//    if (!onlyEdge)
+//    {
+//        unsigned int diffuseNr = 1;
+//        unsigned int specularNr = 1;
+//        unsigned int normalNr = 1;
+//        unsigned int heightNr = 1;
+//
+//        for (unsigned int i = 0; i < textures.size(); ++i) {
+//            m_glFunc->glActiveTexture(GL_TEXTURE0 + i); // 在绑定之前激活相应的纹理单元
+//            // 获取纹理序号（diffuse_textureN 中的 N）
+//            QString number;
+//            QString name = textures[i]->type;
+//            if (name == "texture_diffuse")
+//                number = QString::number(diffuseNr++);
+//            else if (name == "texture_specular")
+//                number = QString::number(specularNr++);
+//            else if (name == "texture_normal")
+//                number = QString::number(normalNr++);
+//            else if (name == "texture_height")
+//                number = QString::number(heightNr++);
+//            textures[i]->texture.bind();
+//            shader->setUniformValue((name + number).toStdString().c_str(), i);
+//        }
+//        // 画网格
+//        QOpenGLVertexArrayObject::Binder bind(&m_VAO);
+//        m_glFunc->glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+//    }
+//
+//    // 画边线
+//    //  Test  重新构造边线VAO
+//    shader->setUniformValue("objectColor", 1.0f, 1.0f, 1.0f, 0.8f);
+//    //m_glFunc->glLineWidth(2.0f);
+//    //vector<unsigned int> lineArray{0, 1, 2, 3, 4, 5};
+//    //int temp = static_cast<unsigned int>(indices.size()) / 2;
+//    QOpenGLVertexArrayObject::Binder bind2(&m_VAOEdge);
+//    m_glFunc->glDrawElements(GL_LINES, static_cast<unsigned int>(edges.size()), GL_UNSIGNED_INT, 0);
+//    //glBindVertexArray(VAOEdge);
+//    //glDrawElements(GL_LINES, static_cast<unsigned int>(edges.size()), GL_UNSIGNED_INT, 0);
+//}
 
 /*!
  * \brief Mesh::setupMesh 绑定顶点和索引

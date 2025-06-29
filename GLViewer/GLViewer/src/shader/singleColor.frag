@@ -9,8 +9,9 @@ in vec3 FragPos;
 uniform vec3 lightPos; 
 uniform vec3 lightColor;
 uniform vec4 objectColor;
+uniform vec4 singleColor;
 
 void main()
 {
-    FragColor = vec4(0.0, 1.0, 1.0, 1.0);
+    FragColor = singleColor;
 }

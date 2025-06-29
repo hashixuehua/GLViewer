@@ -248,7 +248,7 @@ void DrawingComponentHolder::setup()
 void DrawingComponentHolder::draw(QOpenGLShaderProgram& shader)
 {
     //  model
-    m_glFunc->glLineWidth(2.0f);
+    m_glFunc->glLineWidth(Setting::edgeLineWidth);
     if (ViewerSetting::showModel)
     {
         for (unsigned int i = 0; i < meshes.size(); i++)
@@ -263,7 +263,7 @@ void DrawingComponentHolder::draw(QOpenGLShaderProgram& shader)
 void DrawingComponentHolder::drawSelected(QOpenGLShaderProgram& shader, bool drawScaled /*= false*/)
 {
     //  model
-    m_glFunc->glLineWidth(2.0f);
+    m_glFunc->glLineWidth(Setting::edgeLineWidth);
     if (ViewerSetting::showModel)
     {
         for (unsigned int i = 0; i < meshes.size(); i++)
@@ -280,9 +280,9 @@ void DrawingComponentHolder::drawSelected(QOpenGLShaderProgram& shader, bool dra
                 Vector3f vecCross = boxMax - boxMin;
 
                 //  TODO 后续进行统一参数设置管理
-                float xScale = std::min(1.f + ViewerSetting::outlinningWidth / vecCross.X, 2.f);
-                float yScale = std::min(1.f + ViewerSetting::outlinningWidth / vecCross.Y, 2.f);
-                float zScale = std::min(1.f + ViewerSetting::outlinningWidth / vecCross.Z, 2.f);
+                float xScale = std::min(1.f + Setting::outlinningWidth / vecCross.X, 2.f);
+                float yScale = std::min(1.f + Setting::outlinningWidth / vecCross.Y, 2.f);
+                float zScale = std::min(1.f + Setting::outlinningWidth / vecCross.Z, 2.f);
                 Vector3f center = 0.5 * (boxMin + boxMax) / 1000.0;
 
                 QMatrix4x4 mat;

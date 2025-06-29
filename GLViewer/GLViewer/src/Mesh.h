@@ -12,6 +12,8 @@
 #include <QOpenGLTexture>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_5_Core>
+
+#include "Setting.h"
 //#include "assimp/Importer.hpp"
 //#include "assimp/scene.h"
 //#include "assimp/postprocess.h"
@@ -47,7 +49,7 @@ public:
     std::vector<unsigned int> edges;            //边线数据
 
     bool onlyEdge = false;
-    QVector4D edgeColor;
+    //QVector4D edgeColor;
 
     /*  函数  */
     //Mesh(QOpenGLFunctions_4_5_Core* glFunc) {};  //no use
@@ -58,7 +60,7 @@ public:
     ~Mesh();
 
     void Draw(QOpenGLShaderProgram& shader, bool wireFrame = false);
-    void Draw(QOpenGLShaderProgram* shader);
+    //void Draw(QOpenGLShaderProgram* shader);
     void DrawWireframe(QOpenGLShaderProgram& shader);
     void setupMesh();
     QOpenGLVertexArrayObject* getVAO();

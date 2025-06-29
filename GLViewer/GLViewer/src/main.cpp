@@ -3,12 +3,12 @@
 #include <QScreen.h>
 
 #include "glwindow.h"
-#include "ViewerSetting.h"
+#include "Setting.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    ViewerSetting::devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
+    Setting::devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
     GLWindow w;
     w.show();
     return a.exec();

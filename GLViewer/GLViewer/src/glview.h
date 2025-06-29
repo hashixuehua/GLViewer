@@ -103,7 +103,8 @@ private:
     void MSAAResize(int width, int height);
     CurveQueryInfo Query(const QPoint& queryPoint);
 
-    void DrawSelected();
+    void DrawSelected(QOpenGLShaderProgram& shader);
+    void AntiAliasingTest(QOpenGLShaderProgram& shader);
 
 public slots:
     void drawLine();
