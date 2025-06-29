@@ -247,7 +247,7 @@ public:
         float zpos = 0.0;
         // qopenglwidget内部的opengl不随qt缩放，读取像素需手动从qt屏幕坐标转成opengl坐标
         // opengl中y方向0点和qt屏幕中y方向0点不同
-        glFunc->glReadPixels(screenp.x() * ViewerSetting::devicePixelRatio /** device_ratio*/, (h - screenp.y()) * ViewerSetting::devicePixelRatio/* * device_ratio*/, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zpos);
+        glFunc->glReadPixels(screenp.x() * Setting::devicePixelRatio /** device_ratio*/, (h - screenp.y()) * Setting::devicePixelRatio/* * device_ratio*/, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zpos);
         //zpos = zpos * 2 - 1.0;
         return zpos;
     }

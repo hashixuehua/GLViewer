@@ -332,7 +332,7 @@ void DrawingLinesHolder::DrawSelectedLines(QOpenGLShaderProgram& shader)
     setupSelectedLines(lineVerts, selectedLineIndices);
 
     shader.setUniformValue("objectColor", 0.f, 0.f, 1.f, 0.8f);
-    m_glFunc->glLineWidth(3.5f);
+    m_glFunc->glLineWidth(Setting::curveWidth4Selected);
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&VAOSelectedLines);
 
@@ -343,6 +343,8 @@ void DrawingLinesHolder::DrawLines(QOpenGLShaderProgram& shader, const PreviewDa
 {
     if (!ViewerSetting::showLines)
         return;
+
+    m_glFunc->glLineWidth(Setting::curveWidth);
 
     //  sort by layer
     //  选中的lines回单独进行绘制，这里就跳过
@@ -376,7 +378,6 @@ void DrawingLinesHolder::DrawLines(QOpenGLShaderProgram& shader, const PreviewDa
 
         //shader.setUniformValue("objectColor", 1.f, 0.0f, 0.2f, 0.8f);
         shader.setUniformValue("objectColor", cgColor.X / 255.0, cgColor.Y / 255.0, cgColor.Z / 255.0, 0.8f);
-        m_glFunc->glLineWidth(2.0f);
 
         QOpenGLVertexArrayObject::Binder vaoBinder(&VAOLines);
 

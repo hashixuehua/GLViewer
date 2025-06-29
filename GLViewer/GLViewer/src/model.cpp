@@ -21,7 +21,7 @@ Model::~Model()
 
 void Model::Draw2(QOpenGLShaderProgram& shader)
 {
-    m_glFunc->glLineWidth(2.0f);
+    m_glFunc->glLineWidth(Setting::edgeLineWidth);
 
     //  work plane
     //  由于工作平面有透明度，最后绘制
@@ -35,7 +35,7 @@ void Model::Draw2(QOpenGLShaderProgram& shader)
 
 void Model::DrawSelected(QOpenGLShaderProgram& shader, bool drawScaled /*= false*/)
 {
-    m_glFunc->glLineWidth(2.0f);
+    m_glFunc->glLineWidth(Setting::edgeLineWidth);
 
     drawingComponentHolder->drawSelected(shader, drawScaled);
 }

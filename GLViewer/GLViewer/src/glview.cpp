@@ -69,7 +69,7 @@ void GLView::resizeGL(int w, int h)
     m_camera.SCR_WIDTH = w;
     m_camera.SCR_HEIGHT = h;
     SelectionResize(w, h);
-    MSAAResize(ViewerSetting::devicePixelRatio * w, ViewerSetting::devicePixelRatio * h);
+    MSAAResize(Setting::devicePixelRatio * w, Setting::devicePixelRatio * h);
 }
 
 void GLView::paintGL()
@@ -198,8 +198,18 @@ void GLView::paintGL()
     //qDebug() << m_textureShader.log();
     m_textureShader.release();
 
+    m_singleColorShader.bind();
+    m_singleColorShader.setUniformValue("projection", m_projectionMat);
+    m_singleColorShader.setUniformValue("view", m_viewMat);
+    m_singleColorShader.setUniformValue("model", m_modelMatrix);
+
     //  draw selected components
-    DrawSelected();
+    DrawSelected(m_singleColorShader);
+
+    //  TEST Anti Aliasing
+    //AntiAliasingTest(m_singleColorShader);
+
+    m_singleColorShader.release();
 
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -739,7 +749,7 @@ void GLView::DrawSelectionFrame()
     mSelectionFramebuffer->DisableWriting();
 }
 
-void GLView::DrawSelected()
+void GLView::DrawSelected(QOpenGLShaderProgram& shader)
 {
     //  draw selected
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -747,12 +757,9 @@ void GLView::DrawSelected()
     //glDisable(GL_DEPTH_TEST);
     glDepthFunc(GL_NEVER);
 
-    m_singleColorShader.bind();
-    m_singleColorShader.setUniformValue("projection", m_projectionMat);
-    m_singleColorShader.setUniformValue("view", m_viewMat);
-    m_singleColorShader.setUniformValue("model", m_modelMatrix);
+    shader.setUniformValue("singleColor", 0.f, 1.f, 1.f, 1.f);
 
-    m_model->DrawSelected(m_singleColorShader);
+    m_model->DrawSelected(shader);
 
     //  draw outline of selected
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -762,13 +769,47 @@ void GLView::DrawSelected()
 
     //  TODO
     // TODO use shaderSingleColor
-    m_model->DrawSelected(m_singleColorShader, true);
-
-    m_singleColorShader.release();
+    m_model->DrawSelected(shader, true);
 
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);
     glEnable(GL_DEPTH_TEST);
+}
+
+void GLView::AntiAliasingTest(QOpenGLShaderProgram& shader)
+{
+    //  draw selected
+    glStencilFunc(GL_ALWAYS, 2, 0xFF);
+    glStencilMask(0xFF);
+    //glDisable(GL_DEPTH_TEST);
+    glDepthFunc(GL_NEVER);
+
+    bool bTemp = ViewerSetting::wireframeMode;
+    ViewerSetting::wireframeMode = true;
+
+    m_model->Draw2(shader);
+
+    //  draw outline of selected
+    glStencilFunc(GL_NOTEQUAL, 2, 0xFF);
+    glStencilMask(0x00);
+    glDepthFunc(GL_LESS);
+    glDisable(GL_DEPTH_TEST);
+
+    float widthTemp = Setting::edgeLineWidth;
+    Setting::edgeLineWidth = 1.5f * Setting::edgeLineWidth;
+    shader.setUniformValue("singleColor", 0.75f, 0.75f, 0.75f, 1.f);
+
+    int cntSamplesTemp = Setting::sampleSieOfMSAA;
+    Setting::sampleSieOfMSAA = 16;
+
+    m_model->Draw2(shader);
+
+    glStencilMask(0xFF);
+    glStencilFunc(GL_ALWAYS, 0, 0xFF);
+    glEnable(GL_DEPTH_TEST);
+    ViewerSetting::wireframeMode = bTemp;
+    Setting::edgeLineWidth = widthTemp;
+    Setting::sampleSieOfMSAA = cntSamplesTemp;
 }
 
 void GLView::SelectionResize(int width, int height)

@@ -1,7 +1,7 @@
 #include "ViewerSetting.h"
 
 float ViewerSetting::devicePixelRatio = 1.0;
-int ViewerSetting::sampleSieOfMSAA = 4;
+int ViewerSetting::sampleSieOfMSAA = 16;
 float ViewerSetting::outlinningWidth = 100.f;
 
 ViewerStatus ViewerSetting::viewerStatus = ViewerStatus::Unknown;

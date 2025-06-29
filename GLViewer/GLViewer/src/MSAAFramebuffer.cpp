@@ -13,13 +13,13 @@ MSAARender::MSAAFramebuffer::MSAAFramebuffer(int width, int height)
     // create a multisampled color attachment texture
     glGenTextures(1, &textureColorBufferMultiSampled);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, ViewerSetting::sampleSieOfMSAA, GL_RGB, mWidth, mHeight, GL_TRUE);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Setting::sampleSieOfMSAA, GL_RGB, mWidth, mHeight, GL_TRUE);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled, 0);
     // create a (also multisampled) renderbuffer object for depth and stencil attachments
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, ViewerSetting::sampleSieOfMSAA, GL_DEPTH24_STENCIL8, mWidth, mHeight);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, Setting::sampleSieOfMSAA, GL_DEPTH24_STENCIL8, mWidth, mHeight);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 

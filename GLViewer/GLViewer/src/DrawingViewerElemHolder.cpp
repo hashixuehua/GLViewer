@@ -42,6 +42,7 @@ void DrawingViewerElemHolder::drawViewElement(QOpenGLShaderProgram& shader, cons
         return;
 
     auto& viewCube = itrFind->second;
+    QVector4D edgeColorTemp = Setting::edgeLineColor;
 
     string imagePath = "";
     if (name == ViewerCache::viewCube)
@@ -49,7 +50,10 @@ void DrawingViewerElemHolder::drawViewElement(QOpenGLShaderProgram& shader, cons
     else if (name == ViewerCache::mouseLabel)
         imagePath = ":/rotateLabel.png";
     else if (name == ViewerCache::snapLabel || name == ViewerCache::rectSelect)
+    {
         imagePath = "";
+        Setting::edgeLineColor = Setting::snapColor;
+    }
     else
         throw exception("can not get valid image path.");
 
@@ -66,6 +70,7 @@ void DrawingViewerElemHolder::drawViewElement(QOpenGLShaderProgram& shader, cons
     shader.setUniformValue("objectColor", viewCube.color.GetWX(), viewCube.color.GetWY(), viewCube.color.GetWZ(), viewCube.color.GetW());
     viewCube.current->Draw(shader);
 
+    Setting::edgeLineColor = edgeColorTemp;
     if (imagePath != "")
         textTexture->release();
 }
@@ -214,7 +219,7 @@ void DrawingViewerElemHolder::setupSnap()
     }
 
     auto mesh = CGLibUtils::ConvertMesh(m_glFunc, cMesh);
-    mesh->edgeColor = QVector4D(1.0, 0.0, 1.0, 1.0);
+    //mesh->edgeColor = Setting::snapColor;
     mapName2VMesh.insert(make_pair(ViewerCache::snapLabel, MeshInfo(mesh, Vector3W(1.0f, 1.0f, 1.0f, 1.0f))));
 }
 
@@ -245,7 +250,7 @@ void DrawingViewerElemHolder::setupRectSelect()
     }
 
     auto mesh = CGLibUtils::ConvertMesh(m_glFunc, cMesh);
-    mesh->edgeColor = QVector4D(1.0, 0.0, 1.0, 1.0);
+    //mesh->edgeColor = QVector4D(1.0, 0.0, 1.0, 1.0);
     mapName2VMesh.insert(make_pair(ViewerCache::rectSelect, MeshInfo(mesh, Vector3W(1.0f, 1.0f, 1.0f, 1.0f))));
 
 }
@@ -266,7 +271,7 @@ void DrawingViewerElemHolder::drawRectSelect(QOpenGLShaderProgram& shader, const
     //shader.setAttributeBuffer(1, GL_FLOAT, sizeof(GLfloat) * 3, 3, 6 * sizeof(GLfloat));
     //shader.enableAttributeArray(1);
 
-    m_glFunc->glLineWidth(2.0f);
+    m_glFunc->glLineWidth(Setting::curveWidth);
     //vector<unsigned int> lineArray{0, 1, 2, 3, 4, 5};
     //int temp = static_cast<unsigned int>(indices.size()) / 2;
     //glBindVertexArray(VAOMouse);
