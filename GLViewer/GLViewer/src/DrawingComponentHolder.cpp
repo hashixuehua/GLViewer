@@ -248,7 +248,7 @@ void DrawingComponentHolder::setup()
 void DrawingComponentHolder::draw(QOpenGLShaderProgram& shader)
 {
     //  model
-    //m_glFunc->glLineWidth(2.0f);
+    m_glFunc->glLineWidth(Setting::edgeLineWidth);
     if (ViewerSetting::showModel)
     {
         for (unsigned int i = 0; i < meshes.size(); i++)
@@ -263,7 +263,7 @@ void DrawingComponentHolder::draw(QOpenGLShaderProgram& shader)
 void DrawingComponentHolder::drawSelected(QOpenGLShaderProgram& shader, bool drawScaled /*= false*/)
 {
     //  model
-    //m_glFunc->glLineWidth(2.0f);
+    m_glFunc->glLineWidth(Setting::edgeLineWidth);
     if (ViewerSetting::showModel)
     {
         for (unsigned int i = 0; i < meshes.size(); i++)
