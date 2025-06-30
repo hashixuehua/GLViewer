@@ -46,6 +46,6 @@ public:
     static string viewCube;
     static string mouseLabel;
     static string snapLabel;
-    static string rectSelect;
+    static string rectSelect;//deprecated
 
 };

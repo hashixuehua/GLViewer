@@ -48,7 +48,7 @@ public:
     std::vector<Texture*> textures;             //纹理数据
     std::vector<unsigned int> edges;            //边线数据
 
-    bool onlyEdge = false;
+    //bool onlyEdge = false;
     //QVector4D edgeColor;
 
     /*  函数  */

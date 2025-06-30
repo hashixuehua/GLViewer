@@ -104,7 +104,7 @@ private:
     CurveQueryInfo Query(const QPoint& queryPoint);
 
     void DrawSelected(QOpenGLShaderProgram& shader);
-    void AntiAliasingTest(QOpenGLShaderProgram& shader);
+    void DrawEdgeLineWithAntiAliasing(QOpenGLShaderProgram& shader);
 
 public slots:
     void drawLine();

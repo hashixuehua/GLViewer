@@ -28,11 +28,11 @@ void DrawingViewerElemHolder::drawWorkPlane(QOpenGLShaderProgram& shader)
 
     auto& defaultWP = itrFindD->second;
     shader.setUniformValue("objectColor", defaultWP.color.GetWX(), defaultWP.color.GetWY(), defaultWP.color.GetWZ(), defaultWP.color.GetW());
-    defaultWP.current->Draw(shader);
+    defaultWP.current->Draw(shader, ViewerSetting::wireframeMode);
 
     auto& currentWP = itrFindC->second;
     shader.setUniformValue("objectColor", currentWP.color.GetWX(), currentWP.color.GetWY(), currentWP.color.GetWZ(), currentWP.color.GetW());
-    currentWP.current->Draw(shader);
+    currentWP.current->Draw(shader, ViewerSetting::wireframeMode);
 }
 
 void DrawingViewerElemHolder::drawViewElement(QOpenGLShaderProgram& shader, const string& name)
@@ -43,6 +43,7 @@ void DrawingViewerElemHolder::drawViewElement(QOpenGLShaderProgram& shader, cons
 
     auto& viewCube = itrFind->second;
     QVector4D edgeColorTemp = Setting::edgeLineColor;
+    bool wireframeTemp = ViewerSetting::wireframeMode;
 
     string imagePath = "";
     if (name == ViewerCache::viewCube)
@@ -52,7 +53,8 @@ void DrawingViewerElemHolder::drawViewElement(QOpenGLShaderProgram& shader, cons
     else if (name == ViewerCache::snapLabel || name == ViewerCache::rectSelect)
     {
         imagePath = "";
-        Setting::edgeLineColor = Setting::snapColor;
+        Setting::edgeLineColor = Setting::edgeLineColorArray[2];
+        ViewerSetting::wireframeMode = true;
     }
     else
         throw exception("can not get valid image path.");
@@ -68,9 +70,10 @@ void DrawingViewerElemHolder::drawViewElement(QOpenGLShaderProgram& shader, cons
 
     //  viewCube
     shader.setUniformValue("objectColor", viewCube.color.GetWX(), viewCube.color.GetWY(), viewCube.color.GetWZ(), viewCube.color.GetW());
-    viewCube.current->Draw(shader);
+    viewCube.current->Draw(shader, ViewerSetting::wireframeMode);
 
     Setting::edgeLineColor = edgeColorTemp;
+    ViewerSetting::wireframeMode = wireframeTemp;
     if (imagePath != "")
         textTexture->release();
 }

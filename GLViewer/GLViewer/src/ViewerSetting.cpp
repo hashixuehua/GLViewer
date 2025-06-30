@@ -117,6 +117,8 @@ void ViewerSetting::SwitchLinesShownType()
 void ViewerSetting::SwitchWireframeMode()
 {
     wireframeMode = !wireframeMode;
+    Setting::edgeLineColor = wireframeMode ? Setting::edgeLineColorArray[1] : Setting::edgeLineColorArray[0];
+    Setting::edgeLineWidth = wireframeMode ? Setting::edgeLineWidthArray[1] : Setting::edgeLineWidthArray[0];
 }
 
 ////////////////////////

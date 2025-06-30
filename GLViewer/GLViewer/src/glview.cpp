@@ -145,6 +145,10 @@ void GLView::paintGL()
         m_model->DrawViewElement(m_lightShader, ViewerCache::snapLabel);
     }
 
+    //  TEST Anti Aliasing
+    m_lightShader.setUniformValue("model", m_modelMatrix);
+    DrawEdgeLineWithAntiAliasing(m_lightShader);
+
     m_lightShader.release();
     m_textureShader.bind();
 
@@ -205,9 +209,6 @@ void GLView::paintGL()
 
     //  draw selected components
     DrawSelected(m_singleColorShader);
-
-    //  TEST Anti Aliasing
-    //AntiAliasingTest(m_singleColorShader);
 
     m_singleColorShader.release();
 
@@ -776,40 +777,54 @@ void GLView::DrawSelected(QOpenGLShaderProgram& shader)
     glEnable(GL_DEPTH_TEST);
 }
 
-void GLView::AntiAliasingTest(QOpenGLShaderProgram& shader)
+void GLView::DrawEdgeLineWithAntiAliasing(QOpenGLShaderProgram& shader)
 {
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
     //  draw selected
     glStencilFunc(GL_ALWAYS, 2, 0xFF);
     glStencilMask(0xFF);
     //glDisable(GL_DEPTH_TEST);
-    glDepthFunc(GL_NEVER);
+    //glDepthFunc(GL_NEVER);
 
-    bool bTemp = ViewerSetting::wireframeMode;
+    bool bWireframeMode = ViewerSetting::wireframeMode;
     ViewerSetting::wireframeMode = true;
+    float edgeLnWdtCur = Setting::edgeLineWidth;
+    Setting::edgeLineWidth = Setting::edgeLineWidthArray[0];
+    auto edgeClorTemp = Setting::edgeLineColor;
+    Setting::edgeLineColor = Setting::edgeLineColorArray[0];
 
     m_model->Draw2(shader);
 
     //  draw outline of selected
     glStencilFunc(GL_NOTEQUAL, 2, 0xFF);
     glStencilMask(0x00);
-    glDepthFunc(GL_LESS);
-    glDisable(GL_DEPTH_TEST);
+    //glDepthFunc(GL_LESS);
+    //glDisable(GL_DEPTH_TEST);
 
-    float widthTemp = Setting::edgeLineWidth;
-    Setting::edgeLineWidth = 1.5f * Setting::edgeLineWidth;
-    shader.setUniformValue("singleColor", 0.75f, 0.75f, 0.75f, 1.f);
+    //float widthTemp = Setting::edgeLineWidth;
+    //Setting::edgeLineWidth = 1.5f * Setting::edgeLineWidth;
+    //shader.setUniformValue("singleColor", 0.89f, 0.89f, 0.89f, 1.f);
+    //shader.setUniformValue("singleColor", 1.f, 0.f, 0.f, 1.f);
+    //shader.setUniformValue("objectColor", 1.f, 0.f, 0.f, 0.8f);
+    //shader.setUniformValue("objectColor", 0.75f, 1.f, 1.f ,0.8f);
+    Setting::edgeLineColor = QVector4D(0.5f, 1.f, 1.f, 0.8f);
 
-    int cntSamplesTemp = Setting::sampleSieOfMSAA;
-    Setting::sampleSieOfMSAA = 16;
+    Setting::edgeLineWidth = 1.2f * Setting::edgeLineWidth;
+    //int cntSamplesTemp = Setting::sampleSieOfMSAA;
+    //Setting::sampleSieOfMSAA = 16;
 
     m_model->Draw2(shader);
 
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);
-    glEnable(GL_DEPTH_TEST);
-    ViewerSetting::wireframeMode = bTemp;
-    Setting::edgeLineWidth = widthTemp;
-    Setting::sampleSieOfMSAA = cntSamplesTemp;
+    //glEnable(GL_DEPTH_TEST);
+    ViewerSetting::wireframeMode = bWireframeMode;
+    Setting::edgeLineWidth = edgeLnWdtCur;
+    //Setting::sampleSieOfMSAA = cntSamplesTemp;
+    Setting::edgeLineColor = edgeClorTemp;
+
+    glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 }
 
 void GLView::SelectionResize(int width, int height)
